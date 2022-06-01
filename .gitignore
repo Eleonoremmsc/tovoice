@@ -6,3 +6,6 @@ raw_data/
 *.csv
 **/__pycache__/
 .env
+tovoice/data
+tovoice/preprocessing/specs-to-embeddings/pre_trained_embedding_model.ckpt
+tovoice/preprocessing/specs-to-embeddings/*.ipynb
