@@ -3,9 +3,12 @@ from xml.etree.ElementInclude import default_loader
 
 import librosa
 import librosa.display
+import soundfile as sf
+from scipy import signal
 
 import matplotlib.pyplot as plt
 import numpy as np
+from numpy.random import RandomState
 
 # 0. Retrieve file_path
 def retrieve_filepath():
@@ -14,6 +17,7 @@ def retrieve_filepath():
     ROOT_DIR = SOURCE_DIR.parent
     DATA_DIR = ROOT_DIR / "data"
     return DATA_DIR
+
 
 # 1. Get the file path to an included audio in data
 def get_wav_files(data_dir):
@@ -24,27 +28,42 @@ def get_wav_files(data_dir):
     
     return wav_files
 
+    
 # 2. Load the audio as a waveform `y`
 #    Store the sampling rate as `sr`
 def generate_wave_forms(wav_files):
     wave_forms = []
 
     for wav_file in wav_files:
-        y, sr = librosa.load(wav_files[0])
+        #y, sr = librosa.load(wav_file)
+        y, sr = sf.read(wav_file)
         wave_forms.append((y, sr))
     
     return wave_forms
 
+
+#2.1 Apply the butterworth filter:
+def wavs_to_butters(wave_forms, cutoff=30, fs=16_000, order=5):
+    nyq = 0.5 * fs
+    normal_cutoff = cutoff / nyq
+    b, a = signal.butter(order, normal_cutoff, btype='high', analog=False)
+    butter_files=[]
+    for wave_form in wave_forms:
+        wav = signal.filtfilt(b, a, wave_form) # remove drifting noise
+        butter_files.append(wav)
+    return butter_files
+
+
 # 3. Generate a mel spec
-def generate_mel_specs(wave_forms):
+def generate_mel_specs(butter_files):
     mel_specs = []
 
-    for wave_form in wave_forms:
-        y, sr = wave_form
+    for butter_file in butter_files:
+        y, sr = butter_file
         S = librosa.feature.melspectrogram(y=y, sr=sr)
         mel_specs.append((S, sr))
-    
     return mel_specs
+
     
 # 4. Display mel-frequency spectrograms
 def display_mel_specs(mel_specs):
@@ -66,6 +85,7 @@ def display_mel_specs(mel_specs):
 
     plt.show()
     
+    
 # 5. Save mel-frequency spectrograms in Data directory
 def save_mel_specs(mel_specs, wav_files, data_dir):
     for i, mel_spec in enumerate(mel_specs):
@@ -77,7 +97,8 @@ if __name__ == "__main__":
     DATA_DIR = retrieve_filepath()
     wav_files = get_wav_files(DATA_DIR)
     wave_forms = generate_wave_forms(wav_files)
-    mel_specs = generate_mel_specs(wave_forms) 
-    # display_mel_specs(mel_specs)
-    save_mel_specs(mel_specs, wav_files, DATA_DIR)
+    butter_files = wavs_to_butters(wave_forms, cutoff=30, fs=16_000, order=5)
+    mel_specs = generate_mel_specs(butter_files) 
+    display_mel_specs(mel_specs)
+    #save_mel_specs(mel_specs, wav_files, DATA_DIR)
     
