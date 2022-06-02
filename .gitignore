@@ -6,10 +6,14 @@ raw_data/
 *.csv
 **/__pycache__/
 .env
+.direnv/*
 tovoice/data
 tovoice/preprocessing/specs-to-embeddings/pre_trained_embedding_model.ckpt
 tovoice/preprocessing/specs-to-embeddings/*.ipynb
 tovoice/model/weights
+<<<<<<< HEAD
 tovoice/preprocessing/specs-to-embeddings/.ipynb_checkpoints
 tovoice/preprocessing/specs-to-embeddings/Untitled.ipynb
 tovoice/data/spectrograms
+=======
+>>>>>>> master
