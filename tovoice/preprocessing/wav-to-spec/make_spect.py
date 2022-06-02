@@ -1,5 +1,5 @@
 from pathlib import Path
-import os
+
 from xml.etree.ElementInclude import default_loader
 
 import librosa
@@ -12,6 +12,7 @@ from librosa.filters import mel
 import matplotlib.pyplot as plt
 import numpy as np
 from numpy.random import RandomState
+
 
 # 0. Retrieve speaker directory
 def retrieve_dirpath(speaker):
@@ -116,6 +117,7 @@ def display_mel_specs(mel_specs):
     
     
 # 5. Save mel-frequency spectrograms in Data directory
+
 def save_mel_specs(mel_specs, wav_files, speaker_spects_dir):
     for i, mel_spec in enumerate(mel_specs):
         filepath = speaker_spects_dir / wav_files[i].stem
@@ -131,4 +133,5 @@ if __name__ == "__main__":
     mel_specs = generate_mel_specs(butter_files) 
     display_mel_specs(mel_specs)
     save_mel_specs(mel_specs, wav_files, speaker_spects_dir)
+
     
