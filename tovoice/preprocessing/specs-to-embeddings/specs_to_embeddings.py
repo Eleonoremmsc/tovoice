@@ -1,14 +1,15 @@
 
+from curses.ascii import EM
 import os
-from model_bl import D_VECTOR
 import numpy as np
 import torch
+from embedder import Embedder
 
 # fonction qui génère directement un modele d'embedding préentraîné :
 def load_model() :
 
-    model = D_VECTOR(dim_input=80, dim_cell=768, dim_emb=256).eval().cpu()
-    pre_trained_weights = torch.load('pre_trained_embedding_model.ckpt',
+    model = Embedder(dim_input=80, dim_cell=768, dim_emb=256).eval().cpu()
+    pre_trained_weights = torch.load('../../model/weights/pre_trained_embedding_model.ckpt',
                                      map_location=torch.device('cpu'))
 
     model.load_state_dict(pre_trained_weights)
@@ -19,6 +20,12 @@ def load_model() :
 specs_dir = '../../data/spectrograms'
 emb_dir ='../../data/speaker-embeddings'
 
+# fonction de padding
+def pad_seq(x, base=32):
+    len_out = int(base * ceil(float(x.shape[0])/base))
+    len_pad = len_out - x.shape[0]
+    assert len_pad >= 0
+    return np.pad(x, ((0,len_pad),(0,0)), 'constant')
 
 # fonction qui trouve les différents speakers dans le répertoire source
 def get_speakers() :
@@ -42,21 +49,25 @@ def  get_embedding(spkr_name) :
     #génération d'une liste d'embeddings
     for i in file_list :
         embs=[]
-        tmp = np.load(os.path.join(specs_dir, spkr_name, i))
+        tmp = np.load(os.path.join(specs_dir, spkr_name, i),allow_pickle=True)
+        print(spkr_name)
+        print(tmp.shape[0])
         left = np.random.randint(0, tmp.shape[0]-len_crop)
         melsp = torch.from_numpy(tmp[np.newaxis, left:left+len_crop, :]).cpu()
         emb = model(melsp)
         embs.append(emb.detach().squeeze().cpu().numpy())
 
     #retourne la moyenne des embeddings
-    return np.mean(embs, axis=0)
+    result= np.mean(embs, axis=0)
 
+    # Prepro embedding
+    embedding = torch.from_numpy(result[np.newaxis, :])
+    return embedding
 
 #fonction qui sauvegarde un embedding vector dans le dossier cible
 def save_embedding(spkr_name) :
     spkr_embedding=get_embedding(spkr_name)
-
-    np.save(os.path.join(emb_dir,spkr_name),spkr_embedding, allow_pickle=False)
+    torch.save(spkr_embedding,os.path.join(emb_dir,spkr_name))
 
 
 
