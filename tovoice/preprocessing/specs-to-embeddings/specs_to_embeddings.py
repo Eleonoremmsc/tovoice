@@ -16,13 +16,14 @@ def load_model() :
 
 
 # définition des dossier source (specs) et cible (embeddings)
-specs_dir = '../../data/spectograms'
-emb_dir ='../../data/embeddings'
+specs_dir = '../../data/spectrograms'
+emb_dir ='../../data/speaker-embeddings'
 
 
 # fonction qui trouve les différents speakers dans le répertoire source
 def get_speakers() :
-    _, spkrs_list, _ = next(os.walk(specs_dir))
+    dirName, spkrs_list, _ = next(os.walk(specs_dir))
+    print('Found directory: %s' % dirName)
     return spkrs_list
 
 
