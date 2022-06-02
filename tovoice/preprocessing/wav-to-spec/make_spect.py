@@ -5,6 +5,8 @@ import librosa
 import librosa.display
 import soundfile as sf
 from scipy import signal
+from scipy.signal import get_window
+from librosa.filters import mel
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -35,10 +37,10 @@ def generate_wave_forms(wav_files):
     wave_forms = []
 
     for wav_file in wav_files:
-        #y, sr = librosa.load(wav_file)
+        # y, sr = librosa.load(wav_file)
         y, sr = sf.read(wav_file)
         wave_forms.append((y, sr))
-    
+
     return wave_forms
 
 
@@ -49,10 +51,28 @@ def wavs_to_butters(wave_forms, cutoff=30, fs=16_000, order=5):
     b, a = signal.butter(order, normal_cutoff, btype='high', analog=False)
     butter_files=[]
     for wave_form in wave_forms:
-        wav = signal.filtfilt(b, a, wave_form) # remove drifting noise
-        butter_files.append(wav)
+        y, sr = wave_form
+        wav = signal.filtfilt(b, a, y) # remove drifting noise
+        # wav = y * 0.96 + (prng.rand(y.shape[0])-0.5)*1e-06 # Add a little random noise for model roubstness
+        butter_files.append((wav, sr))
     return butter_files
 
+
+# 2.2 
+def pySTFT(x, fft_length=1024, hop_length=256):
+    
+    x = np.pad(x, int(fft_length//2), mode='reflect')
+    
+    noverlap = fft_length - hop_length
+    shape = x.shape[:-1]+((x.shape[-1]-noverlap)//hop_length, fft_length)
+    strides = x.strides[:-1]+(hop_length*x.strides[-1], x.strides[-1])
+    result = np.lib.stride_tricks.as_strided(x, shape=shape,
+                                             strides=strides)
+    
+    fft_window = get_window('hann', fft_length, fftbins=True)
+    result = np.fft.rfft(fft_window * result, n=fft_length).T
+    
+    return np.abs(result) 
 
 # 3. Generate a mel spec
 def generate_mel_specs(butter_files):
@@ -60,7 +80,13 @@ def generate_mel_specs(butter_files):
 
     for butter_file in butter_files:
         y, sr = butter_file
-        S = librosa.feature.melspectrogram(y=y, sr=sr)
+        # S = librosa.feature.melspectrogram(y=y, sr=sr)
+        mel_basis = mel(16000, 1024, fmin=90, fmax=7600, n_mels=80).T
+        min_level = np.exp(-100 / 20 * np.log(10))
+        D = pySTFT(y).T
+        D_mel = np.dot(D, mel_basis)
+        D_db = 20 * np.log10(np.maximum(min_level, D_mel)) - 16
+        S = np.clip((D_db + 100) / 100, 0, 1)  
         mel_specs.append((S, sr))
     return mel_specs
 
@@ -90,7 +116,7 @@ def display_mel_specs(mel_specs):
 def save_mel_specs(mel_specs, wav_files, data_dir):
     for i, mel_spec in enumerate(mel_specs):
         filepath = data_dir / "spectrograms" / wav_files[i].stem
-        np.save(filepath, mel_spec[0])
+        np.save(filepath, mel_spec[0].astype(np.float32), allow_pickle=False)
 
 
 if __name__ == "__main__":
@@ -99,6 +125,6 @@ if __name__ == "__main__":
     wave_forms = generate_wave_forms(wav_files)
     butter_files = wavs_to_butters(wave_forms, cutoff=30, fs=16_000, order=5)
     mel_specs = generate_mel_specs(butter_files) 
-    display_mel_specs(mel_specs)
-    #save_mel_specs(mel_specs, wav_files, DATA_DIR)
+    # display_mel_specs(mel_specs)
+    save_mel_specs(mel_specs, wav_files, DATA_DIR)
     
