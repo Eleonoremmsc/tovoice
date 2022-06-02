@@ -4,12 +4,12 @@
 # import numpy as np
 # from config import CFG
 
-from torch import nn
+import torch
 from config import CFG
 
 from model import Decoder, Encoder, Postnet
 
-class Generator(nn.Module):
+class Generator(torch.nn.Module):
 
     def __init__(self):
         super(Generator, self).__init__()
