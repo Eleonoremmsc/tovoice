@@ -1,4 +1,5 @@
 from pathlib import Path
+
 from xml.etree.ElementInclude import default_loader
 
 import librosa
@@ -12,20 +13,23 @@ import matplotlib.pyplot as plt
 import numpy as np
 from numpy.random import RandomState
 
-# 0. Retrieve file_path
-def retrieve_filepath():
+
+# 0. Retrieve speaker directory
+def retrieve_dirpath(speaker):
     SOURCE_FILE = Path(__file__).resolve()
     SOURCE_DIR = SOURCE_FILE.parent.parent
     ROOT_DIR = SOURCE_DIR.parent
-    DATA_DIR = ROOT_DIR / "data"
-    return DATA_DIR
+    speaker_wavs_dir = ROOT_DIR / "data" / "wavs" / speaker
+    speaker_spects_dir = ROOT_DIR / "data" / "spectrograms" / speaker
+    speaker_spects_dir.mkdir(exist_ok=True)
+    return speaker_wavs_dir, speaker_spects_dir
 
+# 1. Get the file paths to an included audio in a speaker dir
 
-# 1. Get the file path to an included audio in data
-def get_wav_files(data_dir):
+def get_wav_files(speaker_wav_dir):
     wav_files = []
 
-    for f in data_dir.rglob("*.wav"):
+    for f in speaker_wav_dir.rglob("*.wav"):
         wav_files.append(f)
     
     return wav_files
@@ -113,18 +117,21 @@ def display_mel_specs(mel_specs):
     
     
 # 5. Save mel-frequency spectrograms in Data directory
-def save_mel_specs(mel_specs, wav_files, data_dir):
+
+def save_mel_specs(mel_specs, wav_files, speaker_spects_dir):
     for i, mel_spec in enumerate(mel_specs):
-        filepath = data_dir / "spectrograms" / wav_files[i].stem
+        filepath = speaker_spects_dir / wav_files[i].stem
         np.save(filepath, mel_spec[0].astype(np.float32), allow_pickle=False)
 
 
 if __name__ == "__main__":
-    DATA_DIR = retrieve_filepath()
-    wav_files = get_wav_files(DATA_DIR)
+    speaker_wavs_dir, speaker_spects_dir = retrieve_dirpath("eva-longoria")
+    specs_dir = '../../data/spectrograms'
+    wav_files = get_wav_files(speaker_wavs_dir)
     wave_forms = generate_wave_forms(wav_files)
     butter_files = wavs_to_butters(wave_forms, cutoff=30, fs=16_000, order=5)
     mel_specs = generate_mel_specs(butter_files) 
-    # display_mel_specs(mel_specs)
-    save_mel_specs(mel_specs, wav_files, DATA_DIR)
+    display_mel_specs(mel_specs)
+    save_mel_specs(mel_specs, wav_files, speaker_spects_dir)
+
     
