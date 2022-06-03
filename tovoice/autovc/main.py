@@ -38,21 +38,26 @@ spec, len_pad = pad_seq(spec)
 spec = torch.from_numpy(spec[np.newaxis, :, :])#.to(device)
 
 ## Prepro embedding
-#emb1 = torch.from_numpy(emb1[np.newaxis, :])#.to(device)
-#emb2 = torch.from_numpy(emb2[np.newaxis, :])#.to(device)
+emb1 = torch.from_numpy(emb1[np.newaxis, :])#.to(device)
+emb2 = torch.from_numpy(emb2[np.newaxis, :])#.to(device)
 
-with torch.no_grad():  # doesn't charge the model memory
+spect_vc = []
+with torch.no_grad():
     _, psnt, _ = G(spec, emb1, emb2)
+<<<<<<< HEAD
 
 print(psnt.shape)
 
 spect_vc = []
 with torch.no_grad():
     _, psnt, _ = G(spec, emb1, emb2)
+=======
+>>>>>>> master
     if len_pad == 0:
         trgt_uttr = psnt[0, 0, :, :].cpu().numpy()
     else:
         trgt_uttr = psnt[0, 0, :-len_pad, :].cpu().numpy()
+<<<<<<< HEAD
 
     #spect_vc.append( ('{}x{}'.format(emb1,emb2), trgt_uttr) )
     spect_vc.append( ('contentXspeaker', trgt_uttr) )
@@ -98,3 +103,10 @@ with open('results.pkl', 'wb') as handle:
 
 # show spec and emb
 # show concat of spec and emb
+=======
+    #spect_vc.append( ('{}x{}'.format(sbmt_i[0], sbmt_j[0]), trgt_uttr) )
+    spect_vc.append( ('contentXspeaker', trgt_uttr) )
+with open('results.pkl', 'wb') as handle:
+    pickle.dump(spect_vc, handle)
+    
+>>>>>>> master
