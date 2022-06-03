@@ -14,25 +14,25 @@ import numpy as np
 from numpy.random import RandomState
 
 class MakeSpecs():
-    def __init__(self, wavs_dir):
-        self.wavs_dir  = wavs_dir
+    def __init__(self, speaker_name):
+        self.speaker_name  = speaker_name
     
     # 0. Retrieve speaker directory
-    def retrieve_dirpath(self, speaker):
+    def retrieve_dirpath(self, speaker_name):
         SOURCE_FILE = Path(__file__).resolve()
         SOURCE_DIR = SOURCE_FILE.parent.parent
         ROOT_DIR = SOURCE_DIR.parent
-        speaker_wavs_dir = ROOT_DIR / "data" / "wavs" / speaker
-        speaker_spects_dir = ROOT_DIR / "data" / "spectrograms" / speaker
+        speaker_wavs_dir = ROOT_DIR / "data" / "wavs" / speaker_name
+        speaker_spects_dir = ROOT_DIR / "data" / "spectrograms" / speaker_name
         speaker_spects_dir.mkdir(exist_ok=True)
         return speaker_wavs_dir, speaker_spects_dir
 
     # 1. Get the file paths to an included audio in a speaker dir
 
-    def get_wav_files(self, speaker_wav_dir):
+    def get_wav_files(self, speaker_wavs_dir):
         wav_files = []
 
-        for f in speaker_wav_dir.rglob("*.wav"):
+        for f in speaker_wavs_dir.rglob("*.wav"):
             wav_files.append(f)
 
         return wav_files
@@ -90,7 +90,7 @@ class MakeSpecs():
             # S = librosa.feature.melspectrogram(y=y, sr=sr)
             mel_basis = mel(16000, 1024, fmin=90, fmax=7600, n_mels=80).T
             min_level = np.exp(-100 / 20 * np.log(10))
-            D = pySTFT(y).T
+            D = self.pySTFT(y).T
             D_mel = np.dot(D, mel_basis)
             D_db = 20 * np.log10(np.maximum(min_level, D_mel)) - 16
             S = np.clip((D_db + 100) / 100, 0, 1)
@@ -127,18 +127,17 @@ class MakeSpecs():
             np.save(filepath, mel_spec[0].astype(np.float32), allow_pickle=False)
             
     def generate_all_specs(self):
-        # create specs dir 
-        self.wavs_dir
-        pass
+        speaker_wavs_dir, speaker_spects_dir = self.retrieve_dirpath(self.speaker_name)
+        wav_files = self.get_wav_files(speaker_wavs_dir)
+        wave_forms = self.generate_wave_forms(wav_files)
+        butter_files = self.wavs_to_butters(wave_forms)
+        mel_specs = self.generate_mel_specs(butter_files)
+        self.save_mel_specs(mel_specs, wav_files, speaker_spects_dir)
+        
 
 
 
 if __name__ == "__main__":
-    speaker_wavs_dir, speaker_spects_dir = retrieve_dirpath("eddie-griffin")
-    specs_dir = '../../data/spectrograms'
-    wav_files = get_wav_files(speaker_wavs_dir)
-    wave_forms = generate_wave_forms(wav_files)
-    butter_files = wavs_to_butters(wave_forms, cutoff=30, fs=16_000, order=5)
-    mel_specs = generate_mel_specs(butter_files)
-    #display_mel_specs(mel_specs)
-    save_mel_specs(mel_specs, wav_files, speaker_spects_dir)
+    speaker_name = "eva-longoria"
+    make_spec = MakeSpecs(speaker_name)
+    make_spec.generate_all_specs()

@@ -4,15 +4,23 @@ import pickle
 from synthesis import build_model
 from synthesis import wavegen
 
-spect_vc = pickle.load(open('results.pkl', 'rb'))
-device = torch.device("cpu")
-model = build_model().to(device)
-checkpoint = torch.load("checkpoint_step001000000_ema.pth", map_location=torch.device('cpu'))
-model.load_state_dict(checkpoint["state_dict"])
 
-for spect in spect_vc:
-    name = spect[0]
-    c = spect[1]
-    print(name)
-    waveform = wavegen(model, c=c)   
-    sf.write(name+'.wav', waveform, samplerate=16000)
+class Vocoder():
+    
+    def __init__(self, results_pathfile):
+        self.spect_vc = pickle.load(open(results_pathfile, 'rb'))
+        self.device = torch.device("cpu")
+        self.model = build_model().to(self.device)
+        self.checkpoint = torch.load("checkpoint_step001000000_ema.pth", map_location=self.device)
+        self.model.load_state_dict(self.checkpoint["state_dict"])
+
+    def generate_wav_file(self):
+        for spect in self.spect_vc:
+            name = spect[0]
+            c = spect[1]
+            waveform = wavegen(self.model, c=c)   
+            sf.write(name+'.wav', waveform, samplerate=16000)
+
+if __name__ == "__main__":
+    vocoder = Vocoder("results.pkl")
+    vocoder.generate_wav_file()
