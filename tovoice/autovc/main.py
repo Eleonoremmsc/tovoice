@@ -3,7 +3,7 @@ import torch
 import numpy as np
 from math import ceil
 import os
-from autovc import Generator # -> can I remove ?
+from autovc import Generator
 
 def pad_seq(x, base=32):
     len_out = int(base * ceil(float(x.shape[0])/base))
@@ -31,10 +31,10 @@ def auto_main(spec_file, emb1_name, emb2_name):
     with torch.no_grad():
         _, psnt, _ = G(spec, emb1, emb2)
         trgt_uttr = psnt[0, 0, :-len_pad, :].cpu().numpy()
-        spect_vc.append( ('{}x{}'.format(spec,G), trgt_uttr) )
+        spect_vc.append( ('{}x{}'.format(emb1_name,emb2_name), trgt_uttr) )
 
 
-    with open('{}x{}.pkl'.format(emb1_name,emb2_name), 'wb') as handle:
+    with open('/data/autovc_results/{}x{}.pkl'.format(emb1_name,emb2_name), 'wb') as handle:
         pickle.dump(spect_vc, handle)
 
 
