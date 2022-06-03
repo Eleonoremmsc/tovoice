@@ -19,6 +19,8 @@ def pad_seq(x, base=32):
 
 device = "cpu"
 G = Generator().eval().to(device)
+mod = torch.load('generator.ckpt')
+G.load_state_dict(mod)
 
 
 #a = pickle.load(open("/Users/eleonoredebokay/Downloads/metadata.pkl", 'rb'))
@@ -36,15 +38,18 @@ spec, len_pad = pad_seq(spec)
 spec = torch.from_numpy(spec[np.newaxis, :, :])#.to(device)
 
 ## Prepro embedding
-#emb1 = torch.from_numpy(emb1[np.newaxis, :])#.to(device)
-#emb2 = torch.from_numpy(emb2[np.newaxis, :])#.to(device)
+emb1 = torch.from_numpy(emb1[np.newaxis, :])#.to(device)
+emb2 = torch.from_numpy(emb2[np.newaxis, :])#.to(device)
 
-with torch.no_grad():  # doesn't charge the model memory
+spect_vc = []
+with torch.no_grad():
     _, psnt, _ = G(spec, emb1, emb2)
-
-print(psnt.shape)
-
-
-exit()
-
-G(spec, emb1, emb2)
+    if len_pad == 0:
+        trgt_uttr = psnt[0, 0, :, :].cpu().numpy()
+    else:
+        trgt_uttr = psnt[0, 0, :-len_pad, :].cpu().numpy()
+    #spect_vc.append( ('{}x{}'.format(sbmt_i[0], sbmt_j[0]), trgt_uttr) )
+    spect_vc.append( ('contentXspeaker', trgt_uttr) )
+with open('results.pkl', 'wb') as handle:
+    pickle.dump(spect_vc, handle)
+    

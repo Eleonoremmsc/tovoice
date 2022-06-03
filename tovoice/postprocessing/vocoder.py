@@ -5,9 +5,9 @@ from synthesis import build_model
 from synthesis import wavegen
 
 spect_vc = pickle.load(open('results.pkl', 'rb'))
-device = torch.device("cuda")
+device = torch.device("cpu")
 model = build_model().to(device)
-checkpoint = torch.load("checkpoint_step001000000_ema.pth")
+checkpoint = torch.load("checkpoint_step001000000_ema.pth", map_location=torch.device('cpu'))
 model.load_state_dict(checkpoint["state_dict"])
 
 for spect in spect_vc:
