@@ -1,23 +1,12 @@
-from copyreg import pickle
 import torch
-from tovoice.model import Generator
-from tovoice.config import CFG
-import numpy as np
+from autovc import Generator
 from math import ceil
-
-from torch import nn
-
-import pickle
 
 device = "cpu"
 G = Generator().eval().to(device)
 
 mod = torch.load('autovc.ckpt', map_location=device)["model"]
 opt = torch.load('autovc.ckpt', map_location=device)["optimizer"]
-
-#import sys
-#print(sys.getsizeof(mod))
-#print(sys.getsizeof(opt))
 
 with torch.no_grad():
     G.encoder.conv[0].weight.data = mod["encoder.convolutions.0.0.conv.weight"]
@@ -141,27 +130,4 @@ G = Generator().eval().to(device)
 mod = torch.load('generator.ckpt', map_location=device)
 G.load_state_dict(mod)
 
-exit()
-
-# opt = torch.load('autovc.ckpt', map_location=device)["optimizer"]
-# print(opt.keys())
-
-# print(type(g_checkpoint['model']))
-
-# for k in mod:
-#     print(k)
-# exit()
-
-# for name, module in G.named_modules():
-#     if isinstance(module, nn.Sequential):
-#         continue
-#     if list(module.named_children()) == []:
-#         print(name, module)
-
-# print(list(G.named_modules())[0][1])
-
-# print([n for n, _ in G.named_modules()])
-# exit()
-# print(len(mod))
-# print(len([n for n, _ in G.named_modules()]))
 exit()
