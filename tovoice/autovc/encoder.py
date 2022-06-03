@@ -21,7 +21,7 @@ class Encoder(nn.Module):
 
         self.lstm = nn.LSTM(512, CFG.dim_neck, 2, batch_first=True, bidirectional=True)
 
-    def forward(self, spc, emb):  # 1 spec, 1 Embedding
+    def forward(self, spc, emb):
 
         # Preprocessing and concatenating
         spc = spc.squeeze(1).transpose(2, 1)
@@ -39,7 +39,7 @@ class Encoder(nn.Module):
         out_forward = outputs[:, :, : CFG.dim_neck]
         out_backward = outputs[:, :, CFG.dim_neck :]
 
-        # Downsampling
+        # Constructing information bottleneck
         codes = []
         for i in range(0, outputs.size(1), CFG.freq):
             codes.append(
@@ -50,8 +50,3 @@ class Encoder(nn.Module):
             )
 
         return codes
-"""
--> concatenates slices of forward and backward -> abh von freq = 32
-ex.: append concat of slice(0+32-1) and slice(0) (along dimension 1)
-     append concat of slice(17+32-1) and slice(32) (along dimension 1)codes is a list of
-"""
