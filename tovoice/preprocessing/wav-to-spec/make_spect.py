@@ -31,10 +31,10 @@ def get_wav_files(speaker_wav_dir):
 
     for f in speaker_wav_dir.rglob("*.wav"):
         wav_files.append(f)
-    
+
     return wav_files
 
-    
+
 # 2. Load the audio as a waveform `y`
 #    Store the sampling rate as `sr`
 def generate_wave_forms(wav_files):
@@ -62,21 +62,21 @@ def wavs_to_butters(wave_forms, cutoff=30, fs=16_000, order=5):
     return butter_files
 
 
-# 2.2 
+# 2.2
 def pySTFT(x, fft_length=1024, hop_length=256):
-    
+
     x = np.pad(x, int(fft_length//2), mode='reflect')
-    
+
     noverlap = fft_length - hop_length
     shape = x.shape[:-1]+((x.shape[-1]-noverlap)//hop_length, fft_length)
     strides = x.strides[:-1]+(hop_length*x.strides[-1], x.strides[-1])
     result = np.lib.stride_tricks.as_strided(x, shape=shape,
                                              strides=strides)
-    
+
     fft_window = get_window('hann', fft_length, fftbins=True)
     result = np.fft.rfft(fft_window * result, n=fft_length).T
-    
-    return np.abs(result) 
+
+    return np.abs(result)
 
 # 3. Generate a mel spec
 def generate_mel_specs(butter_files):
@@ -90,11 +90,11 @@ def generate_mel_specs(butter_files):
         D = pySTFT(y).T
         D_mel = np.dot(D, mel_basis)
         D_db = 20 * np.log10(np.maximum(min_level, D_mel)) - 16
-        S = np.clip((D_db + 100) / 100, 0, 1)  
+        S = np.clip((D_db + 100) / 100, 0, 1)
         mel_specs.append((S, sr))
     return mel_specs
 
-    
+
 # 4. Display mel-frequency spectrograms
 def display_mel_specs(mel_specs):
     nb_cols = 5
@@ -114,8 +114,8 @@ def display_mel_specs(mel_specs):
         ax.set(title='Mel-frequency spectrogram')
 
     plt.show()
-    
-    
+
+
 # 5. Save mel-frequency spectrograms in Data directory
 
 def save_mel_specs(mel_specs, wav_files, speaker_spects_dir):
@@ -125,13 +125,11 @@ def save_mel_specs(mel_specs, wav_files, speaker_spects_dir):
 
 
 if __name__ == "__main__":
-    speaker_wavs_dir, speaker_spects_dir = retrieve_dirpath("eva-longoria")
+    speaker_wavs_dir, speaker_spects_dir = retrieve_dirpath("eddie-griffin")
     specs_dir = '../../data/spectrograms'
     wav_files = get_wav_files(speaker_wavs_dir)
     wave_forms = generate_wave_forms(wav_files)
     butter_files = wavs_to_butters(wave_forms, cutoff=30, fs=16_000, order=5)
-    mel_specs = generate_mel_specs(butter_files) 
-    display_mel_specs(mel_specs)
+    mel_specs = generate_mel_specs(butter_files)
+    #display_mel_specs(mel_specs)
     save_mel_specs(mel_specs, wav_files, speaker_spects_dir)
-
-    
