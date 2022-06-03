@@ -9,7 +9,7 @@ from embedder import Embedder
 def load_model() :
 
     model = Embedder(dim_input=80, dim_cell=768, dim_emb=256).eval().cpu()
-    pre_trained_weights = torch.load('../../model/weights/pre_trained_embedding_model.ckpt',
+    pre_trained_weights = torch.load('pre_trained_embedding_model.ckpt',
                                      map_location=torch.device('cpu'))
 
     model.load_state_dict(pre_trained_weights)
