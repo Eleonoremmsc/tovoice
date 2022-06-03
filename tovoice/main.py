@@ -18,27 +18,23 @@ def pad_seq(x, base=32):
 device = "cpu"
 G = Generator().eval().to(device)
 
-a = pickle.load(open("/Users/eleonoredebokay/Downloads/metadata.pkl", 'rb'))
-x, y, z = a[0]
-
-print(y.shape)
-print(z.shape)
+#a = pickle.load(open("/Users/eleonoredebokay/Downloads/metadata.pkl", 'rb'))
+#x, y, z = a[0]
 
 spec = np.load("p225_003.npy")
 emb1 = np.load("spkr1.npy")
 emb2 = np.load("spkr2.npy")
 
-print("IN SHAPE", spec.shape, emb1.shape, emb2.shape)
+#print("IN SHAPE", spec.shape, emb1.shape, emb2.shape)
 
-# G(z, y, y)
 
 # Prepro spec
 spec, len_pad = pad_seq(spec)
 spec = torch.from_numpy(spec[np.newaxis, :, :])#.to(device)
 
-# Prepro embedding
-emb1 = torch.from_numpy(emb1[np.newaxis, :])#.to(device)
-emb2 = torch.from_numpy(emb2[np.newaxis, :])#.to(device)
+## Prepro embedding
+#emb1 = torch.from_numpy(emb1[np.newaxis, :])#.to(device)
+#emb2 = torch.from_numpy(emb2[np.newaxis, :])#.to(device)
 
 with torch.no_grad():  # doesn't charge the model memory
     _, psnt, _ = G(spec, emb1, emb2)
