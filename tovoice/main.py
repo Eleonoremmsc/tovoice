@@ -40,7 +40,7 @@ spec = torch.from_numpy(spec[np.newaxis, :, :])#.to(device)
 emb1 = torch.from_numpy(emb1[np.newaxis, :])#.to(device)
 emb2 = torch.from_numpy(emb2[np.newaxis, :])#.to(device)
 
-with torch.no_grad():
+with torch.no_grad():  # doesn't charge the model memory
     _, psnt, _ = G(spec, emb1, emb2)
 
 print(psnt)
