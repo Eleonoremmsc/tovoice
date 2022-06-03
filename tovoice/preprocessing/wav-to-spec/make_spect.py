@@ -125,7 +125,7 @@ def save_mel_specs(mel_specs, wav_files, speaker_spects_dir):
 
 
 if __name__ == "__main__":
-    speaker_wavs_dir, speaker_spects_dir = retrieve_dirpath("eva-longoria")
+    speaker_wavs_dir, speaker_spects_dir = retrieve_dirpath("eddie-griffin")
     specs_dir = '../../data/spectrograms'
     wav_files = get_wav_files(speaker_wavs_dir)
     wave_forms = generate_wave_forms(wav_files)
