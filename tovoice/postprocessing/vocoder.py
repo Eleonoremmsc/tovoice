@@ -19,8 +19,8 @@ class Vocoder():
             name = spect[0]
             c = spect[1]
             waveform = wavegen(self.model, c=c)   
-            sf.write(name+'.wav', waveform, samplerate=16000)
+            sf.write(f"../data/outputs/{name}.wav", waveform, samplerate=16000)
 
 if __name__ == "__main__":
-    vocoder = Vocoder("results.pkl")
+    vocoder = Vocoder("../data/autovc_results/results.pkl")
     vocoder.generate_wav_file()

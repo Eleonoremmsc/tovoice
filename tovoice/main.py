@@ -28,7 +28,8 @@ G.load_state_dict(mod)
 
 
 spec = np.load("p225_003.npy")
-emb1 = np.load("spkr1.npy")
+#emb1 = np.load("spkr1.npy")
+emb1 = np.load(emb1_name)
 emb2 = np.load("spkr2.npy")
 
 #print("IN SHAPE", spec.shape, emb1.shape, emb2.shape)
@@ -48,7 +49,7 @@ with torch.no_grad():
         trgt_uttr = psnt[0, 0, :, :].cpu().numpy()
     else:
         trgt_uttr = psnt[0, 0, :-len_pad, :].cpu().numpy()
-    #spect_vc.append( ('{}x{}'.format(sbmt_i[0], sbmt_j[0]), trgt_uttr) )
+    #spect_vc.append( ('{emb1_name}x{emb2_name}'.format(sbmt_i[0], sbmt_j[0]), trgt_uttr) )
     spect_vc.append( ('contentXspeaker', trgt_uttr) )
 with open('results.pkl', 'wb') as handle:
     pickle.dump(spect_vc, handle)
