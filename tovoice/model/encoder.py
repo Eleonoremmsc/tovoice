@@ -39,7 +39,7 @@ class Encoder(nn.Module):
         out_forward = outputs[:, :, : CFG.dim_neck]
         out_backward = outputs[:, :, CFG.dim_neck :]
 
-        # TODO Clarify
+        # Downsampling
         codes = []
         for i in range(0, outputs.size(1), CFG.freq):
             codes.append(
@@ -49,24 +49,9 @@ class Encoder(nn.Module):
                 )
             )
 
-        # here pre-bottleneck and post-bottleneck are concatenated
-        # concat version is appended x times in codes
-        # x : (from 0 to (length of outputs - axis 1)) with step : freq
-
-# concatenates forward(i + CFG.freq - 1) and backward(i), i = "columns"
-# -> only concatenates slices of tensor -> abh von freq = 16
-# ex.: append concat of slice(0+16-1) and slice(0) (along dimension 1)
-#      append concat of slice(17+16-1) and slice(16) (along dimension 1)
-
-# codes is a list of
-
         return codes
-
 """
-as a key step of constructing the information bottleneck,
-both the forward and backward outputs of the bidirectional
-LSTM are downsampled by 32
-downsampled differently for back- and forward
-forward output, the time steps {0, 32, 64, · · · }
-backward output, the time steps {31, 63, 95, · · · }
+-> concatenates slices of forward and backward -> abh von freq = 32
+ex.: append concat of slice(0+32-1) and slice(0) (along dimension 1)
+     append concat of slice(17+32-1) and slice(32) (along dimension 1)codes is a list of
 """
