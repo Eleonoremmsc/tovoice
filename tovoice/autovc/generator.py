@@ -1,13 +1,6 @@
-# import torch
-# import torch.nn as nn
-# import torch.nn.functional as F
-# import numpy as np
-# from config import CFG
-
 import torch
-from config import CFG
+from autovc import Decoder, Encoder, Postnet
 
-from model import Decoder, Encoder, Postnet
 
 class Generator(torch.nn.Module):
 
@@ -20,11 +13,11 @@ class Generator(torch.nn.Module):
 
     def forward(self, spc, emb_1, emb_2):
 
-        # TODO Better name ?
+        # TODO Better name ? input_1 ?
         codes = self.encoder(spc, emb_1)
 
         if emb_2 is None:
-            return torch.cat(codes, dim=-1) # if 2nd Embedding missing : return cat of encoded spec and 1st Embedding
+            return torch.cat(codes, dim=-1)
 
         tmp = []
         for code in codes:
@@ -43,4 +36,4 @@ class Generator(torch.nn.Module):
         mel_outputs = mel_outputs.unsqueeze(1)
         mel_outputs_postnet = mel_outputs_postnet.unsqueeze(1)
 
-        return mel_outputs, mel_outputs_postnet, torch.cat(codes, dim=-1) # else return ....
+        return mel_outputs, mel_outputs_postnet, torch.cat(codes, dim=-1)
