@@ -31,7 +31,7 @@ def auto_main(spec_file, emb1_name, emb2_name):
     with torch.no_grad():
         _, psnt, _ = G(spec, emb1, emb2)
         trgt_uttr = psnt[0, 0, :-len_pad, :].cpu().numpy()
-        spect_vc.append( ('{}x{}'.format(spec,G), trgt_uttr) )
+        spect_vc.append( ('{}x{}'.format(emb1_name,emb2_name), trgt_uttr) )
 
 
     with open('/data/autovc_results/{}x{}.pkl'.format(emb1_name,emb2_name), 'wb') as handle:
