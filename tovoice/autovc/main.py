@@ -1,9 +1,11 @@
-from copyreg import pickle
+import pickle
 import torch
 import numpy as np
 from math import ceil
 import os
 from autovc import Generator
+
+
 
 def pad_seq(x, base=32):
     len_out = int(base * ceil(float(x.shape[0])/base))
@@ -14,13 +16,13 @@ def pad_seq(x, base=32):
 
 def auto_main(spec_file, emb1_name, emb2_name):
 
-    spec = np.load(os.path.join("/data/spectrograms", spec_file))
-    emb1 = torch.load(os.path.join("/data/speaker-embeddings", emb1_name))
-    emb2 = torch.load(os.path.join("/data/speaker-embeddings", emb1_name))
+    spec = np.load(os.path.join("data/spectrograms", emb1_name, spec_file))
+    emb1 = torch.load(os.path.join("data/speaker-embeddings", emb1_name))
+    emb2 = torch.load(os.path.join("data/speaker-embeddings", emb2_name))
 
     device = "cpu"
     G = Generator().eval().to(device)
-    mod = torch.load('generator.ckpt')
+    mod = torch.load('autovc/generator.ckpt')
     G.load_state_dict(mod)
 
     # Preprocess spec
@@ -34,7 +36,7 @@ def auto_main(spec_file, emb1_name, emb2_name):
         spect_vc.append( ('{}x{}'.format(emb1_name,emb2_name), trgt_uttr) )
 
 
-    with open('/data/autovc_results/{}x{}.pkl'.format(emb1_name,emb2_name), 'wb') as handle:
+    with open('data/autovc_results/{}x{}.pkl'.format(emb1_name,emb2_name), 'wb') as handle:
         pickle.dump(spect_vc, handle)
 
 

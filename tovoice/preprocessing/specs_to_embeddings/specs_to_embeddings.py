@@ -2,7 +2,7 @@ from pathlib import Path
 import os
 import numpy as np
 import torch
-from specs_to_embeddings.embedder import Embedder
+from preprocessing.specs_to_embeddings.embedder import Embedder
 
 
 class MakeEmbedding() :

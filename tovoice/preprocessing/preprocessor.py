@@ -1,5 +1,8 @@
-from wav_to_spec import MakeSpecs
-from specs_to_embeddings.specs_to_embeddings import MakeEmbedding
+# from wav_to_spec import MakeSpecs
+# from specs_to_embeddings.specs_to_embeddings import MakeEmbedding
+
+from preprocessing.wav_to_spec import MakeSpecs
+from preprocessing.specs_to_embeddings.specs_to_embeddings import MakeEmbedding
 
 class Preprocessor():
     def __init__(self, speaker_name):

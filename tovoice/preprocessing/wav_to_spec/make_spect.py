@@ -59,8 +59,9 @@ class MakeSpecs():
         butter_files=[]
         for wave_form in wave_forms:
             y, sr = wave_form
-            wav = signal.filtfilt(b, a, y) # remove drifting noise
-            # wav = y * 0.96 + (prng.rand(y.shape[0])-0.5)*1e-06 # Add a little random noise for model roubstness
+            y = signal.filtfilt(b, a, y) # remove drifting noise
+            prng = RandomState(0) 
+            wav = y * 0.96 + (prng.rand(y.shape[0])-0.5)*1e-06 # Add a little random noise for model roubstness
             butter_files.append((wav, sr))
         return butter_files
 
