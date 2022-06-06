@@ -74,9 +74,9 @@ class MakeEmbedding() :
         return embedding
 
     #fonction qui sauvegarde un embedding vector dans le dossier cible
-    def save_embedding(self,spkr_name) :
-        spkr_embedding=self.get_embedding(spkr_name)
-        torch.save(spkr_embedding,os.path.join(self.emb_dir,spkr_name))
+    def save_embedding(self) :
+        spkr_embedding=self.get_embedding(self.speaker_name)
+        torch.save(spkr_embedding,os.path.join(self.emb_dir,self.speaker_name))
 
 
 
