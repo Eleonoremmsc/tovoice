@@ -1,4 +1,5 @@
 import torch
+from pathlib import Path
 from autovc import Decoder, Encoder, Postnet
 
 
@@ -37,3 +38,13 @@ class Generator(torch.nn.Module):
         mel_outputs_postnet = mel_outputs_postnet.unsqueeze(1)
 
         return mel_outputs, mel_outputs_postnet, torch.cat(codes, dim=-1)
+
+def get_generator():
+
+    SOURCE_FILE = Path(__file__).resolve()
+
+    G = Generator().eval().to("cpu")
+    # TODO Cleanup
+    mod = torch.load(SOURCE_FILE.parent /'generator.ckpt')
+    G.load_state_dict(mod)
+    return G

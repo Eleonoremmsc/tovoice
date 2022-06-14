@@ -11,12 +11,11 @@ from librosa.filters import mel
 
 import matplotlib.pyplot as plt
 import numpy as np
-from numpy.random import RandomState
 
 class MakeSpecs():
     def __init__(self, speaker_name):
         self.speaker_name  = speaker_name
-    
+
     # 0. Retrieve speaker directory
     def retrieve_dirpath(self, speaker_name):
         SOURCE_FILE = Path(__file__).resolve()
@@ -125,7 +124,7 @@ class MakeSpecs():
         for i, mel_spec in enumerate(mel_specs):
             filepath = speaker_spects_dir / wav_files[i].stem
             np.save(filepath, mel_spec[0].astype(np.float32), allow_pickle=False)
-            
+
     def generate_all_specs(self):
         speaker_wavs_dir, speaker_spects_dir = self.retrieve_dirpath(self.speaker_name)
         wav_files = self.get_wav_files(speaker_wavs_dir)
@@ -133,7 +132,7 @@ class MakeSpecs():
         butter_files = self.wavs_to_butters(wave_forms)
         mel_specs = self.generate_mel_specs(butter_files)
         self.save_mel_specs(mel_specs, wav_files, speaker_spects_dir)
-        
+
 
 
 
