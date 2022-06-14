@@ -2,10 +2,10 @@ from pathlib import Path
 import os
 import numpy as np
 import torch
-from specs_to_embeddings.embedder import Embedder
+from preprocessing.specs_to_embeddings.embedder import Embedder
 
 
-class MakeEmbedding() :
+class MakeEmbedding():
     def __init__(self,speaker_name) :
         SOURCE_FILE = Path(__file__).resolve()
         SOURCE_DIR = SOURCE_FILE.parent.parent
@@ -56,10 +56,9 @@ class MakeEmbedding() :
 
         #définition de la taille std des extraits de voix pour générer les embedding
         len_crop = 128
-
+        embs=[]
         #génération d'une liste d'embeddings
         for i in file_list :
-            embs=[]
             tmp = np.load(os.path.join(self.specs_dir, spkr_name, i),allow_pickle=True)
             left = np.random.randint(0, tmp.shape[0]-len_crop)
             melsp = torch.from_numpy(tmp[np.newaxis, left:left+len_crop, :]).cpu()
@@ -74,10 +73,9 @@ class MakeEmbedding() :
         return embedding
 
     #fonction qui sauvegarde un embedding vector dans le dossier cible
-    def save_embedding(self,spkr_name) :
-        spkr_embedding=self.get_embedding(spkr_name)
-        torch.save(spkr_embedding,os.path.join(self.emb_dir,spkr_name))
-
+    def save_embedding(self) :
+        spkr_embedding=self.get_embedding(self.speaker_name)
+        torch.save(spkr_embedding,os.path.join(self.emb_dir,self.speaker_name))
 
 
 
