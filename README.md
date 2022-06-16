@@ -1,10 +1,10 @@
 # Data analysis
-- Document here the project: tovoice
-- Description: Project Description
-- Data Source:
-- Type of analysis:
+- Project ToVoice
+- This repo is the product of a 10 day project which was carried out at the end of a Data Science bootcamp at Le Wagon
+- Data Source: https://github.com/auspicious3000/autovc
+- Type of analysis: Zero shot voice conversion - (result : the model still needs to be trained on voices to work)
 
-Please document the project the better you can.
+We looked at the original model's thesis and github repo to be able to work on this reconstruction.
 
 # Startup the project
 
