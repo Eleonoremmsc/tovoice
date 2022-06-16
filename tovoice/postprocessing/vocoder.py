@@ -1,11 +1,10 @@
+import pickle
 import torch
 import soundfile as sf
-import pickle
-from postprocessing.synthesis import build_model
-from postprocessing.synthesis import wavegen
 from pathlib import Path
 
-#from tovoice import postprocessing
+from postprocessing.synthesis import build_model
+from postprocessing.synthesis import wavegen
 
 
 class Vocoder():
@@ -27,6 +26,7 @@ class Vocoder():
             waveform = wavegen(self.model, c=c)
             sf.write(SOURCE_DIR / f"data/outputs/{name}.wav", waveform, samplerate=16000)
 
+            
 if __name__ == "__main__":
     vocoder = Vocoder("/data/autovc_results/results.pkl")
     vocoder.generate_wav_file()
