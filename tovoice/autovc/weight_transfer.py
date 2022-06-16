@@ -5,8 +5,8 @@ from math import ceil
 device = "cpu"
 G = Generator().eval().to(device)
 
-mod = torch.load('autovc.ckpt', map_location=device)["model"]
-opt = torch.load('autovc.ckpt', map_location=device)["optimizer"]
+mod = torch.load('autovc/autovc.ckpt', map_location=device)["model"]
+opt = torch.load('autovc/autovc.ckpt', map_location=device)["optimizer"]
 
 with torch.no_grad():
     G.encoder.conv[0].weight.data = mod["encoder.convolutions.0.0.conv.weight"]
@@ -124,10 +124,10 @@ with torch.no_grad():
     G.postnet.conv[11].running_var.data         = mod["postnet.convolutions.4.1.running_var"]
     G.postnet.conv[11].num_batches_tracked.data = mod["postnet.convolutions.4.1.num_batches_tracked"]
 
-torch.save(G.state_dict(), 'generator.ckpt')
+torch.save(G.state_dict(), 'autovc/generator.ckpt')
 
 G = Generator().eval().to(device)
-mod = torch.load('generator.ckpt', map_location=device)
+mod = torch.load('autovc/generator.ckpt', map_location=device)
 G.load_state_dict(mod)
 
 exit()

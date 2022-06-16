@@ -80,7 +80,6 @@ class MakeEmbedding():
 
 
 
-
 #if __name__ == '__main__':
 #    spkrs_list = get_speakers()
 #    for speaker in spkrs_list :
