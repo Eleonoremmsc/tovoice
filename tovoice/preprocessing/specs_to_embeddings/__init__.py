@@ -1,1 +1,2 @@
-from preprocessing.specs_to_embeddings.specs_to_embeddings import MakeEmbedding
+from .embedder import Embedder
+from .specs_to_embeddings import MakeEmbedding

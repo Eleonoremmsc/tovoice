@@ -1,29 +1,31 @@
+import os
 import pickle
 import torch
 import numpy as np
+
+from copyreg import pickle
 from math import ceil
-import os
-from autovc import Generator
+from pathlib import Path
 
-
-
-def pad_seq(x, base=32):
-    len_out = int(base * ceil(float(x.shape[0])/base))
-    len_pad = len_out - x.shape[0]
-    assert len_pad >= 0
-    return np.pad(x, ((0,len_pad),(0,0)), 'constant'), len_pad
+from autovc import Generator, get_generator
+from preprocessing import pad_seq
 
 
 def auto_main(spec_file, emb1_name, emb2_name):
 
-    spec = np.load(os.path.join("data/spectrograms", emb1_name, spec_file))
-    emb1 = torch.load(os.path.join("data/speaker-embeddings", emb1_name))
-    emb2 = torch.load(os.path.join("data/speaker-embeddings", emb2_name))
+    SOURCE_FILE = Path(__file__).resolve()
+    SOURCE_DIR = SOURCE_FILE.parent
+    ROOT_DIR = SOURCE_DIR.parent
+    spec = np.load(ROOT_DIR /"data/spectrograms"/emb1_name/ spec_file)
+    emb1 = torch.load(ROOT_DIR /"data/speaker-embeddings"/ emb1_name)
+    emb2 = torch.load(ROOT_DIR /"data/speaker-embeddings"/ emb2_name)
 
-    device = "cpu"
-    G = Generator().eval().to(device)
-    mod = torch.load('autovc/generator.ckpt')
-    G.load_state_dict(mod)
+    G = get_generator()
+
+    #G = Generator().eval().to("cpu")
+    #mod = torch.load(ROOT_DIR.parent/'generator_syn.ckpt')
+    #G.load_state_dict(mod)
+
 
     # Preprocess spec
     spec, len_pad = pad_seq(spec)
@@ -33,18 +35,10 @@ def auto_main(spec_file, emb1_name, emb2_name):
     with torch.no_grad():
         _, psnt, _ = G(spec, emb1, emb2)
         trgt_uttr = psnt[0, 0, :-len_pad, :].cpu().numpy()
-        spect_vc.append( ('{}x{}'.format(emb1_name,emb2_name), trgt_uttr) )
+        spect_vc.append(('{}x{}'.format(emb1_name, emb2_name), trgt_uttr))
 
-
-    with open('data/autovc_results/{}x{}.pkl'.format(emb1_name,emb2_name), 'wb') as handle:
+    with open(ROOT_DIR/'data/autovc_results/{}_x_{}_x_{}.pkl'.format(emb1_name, spec_file, emb2_name), 'wb') as handle:
         pickle.dump(spect_vc, handle)
-
-
-
-
-
-
-
 
 
 
