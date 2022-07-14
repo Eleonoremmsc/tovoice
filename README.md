@@ -1,4 +1,4 @@
-# Data analysis
+# Deep Neural Network
 - Project ToVoice
 - This repo is the product of a 10 day project which was carried out at the end of a Data Science bootcamp at Le Wagon
 - Data Source: https://github.com/auspicious3000/autovc
